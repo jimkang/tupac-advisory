@@ -20,8 +20,12 @@ var infoForWords = {
 test('Build sentence', function buildSentenceTest(t) {
   t.plan(3);
 
-  function mockGetPartsOfSpeech(word, done) {
-    callNextTick(done, null, infoForWords[word].partsOfSpeech);
+  function mockGetPartsOfSpeechForMultipleWords(words, done) {
+    callNextTick(done, null, words.map(getPartsOfSpeechForWord));
+  }
+
+  function getPartsOfSpeechForWord(word) {
+    return infoForWords[word].partsOfSpeech;
   }
 
   function mockGetRandomWords(opts, done) {
@@ -34,8 +38,9 @@ test('Build sentence', function buildSentenceTest(t) {
 
   createBuildSentence(
     {
-      getPartsOfSpeech: mockGetPartsOfSpeech,
-      countSyllables: mockCountSyllables
+      getPartsOfSpeechForMultipleWords: mockGetPartsOfSpeechForMultipleWords,
+      countSyllables: mockCountSyllables,
+      getRandomWords: mockGetRandomWords
     },
     useBuilder
   );
