@@ -23,3 +23,8 @@ post-receive: sync-worktree-to-git npm-install stop start
 build-rime-db:
 	cd node_modules/rime && \
 	make build-word-phoneme-map
+
+data/word-syllable.db:
+	node setup/build-syllable-database.js
+
+setup: build-rime-db data/word-syllable.db

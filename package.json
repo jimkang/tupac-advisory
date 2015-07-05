@@ -27,6 +27,7 @@
     "rime": "^1.0.0",
     "twit": "^1.1.20",
     "verror": "^1.6.0",
+    "word-syllable-map": "^1.0.0",
     "wordnok": "^2.2.1"
   }
 }
