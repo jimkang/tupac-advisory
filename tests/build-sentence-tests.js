@@ -1,24 +1,26 @@
 var test = require('tape');
 var createBuildSentence = require('../build-sentence');
 var callNextTick = require('call-next-tick');
+var createWordSyllableMap = require('word-syllable-map').createWordSyllableMap;
 
 var infoForWords = {
   sleep: {
-    partsOfSpeech: ['noun'],
-    syllableCount: 1
+    partsOfSpeech: ['noun']
   },
   get: {
-    partsOfSpeech: ['verb'],
-    syllableCount: 1
+    partsOfSpeech: ['verb']
   },
   some: {
-    partsOfSpeech: ['adjective'],
-    syllableCount: 1
+    partsOfSpeech: ['adjective']
   }
 }
 
 test('Build sentence', function buildSentenceTest(t) {
   t.plan(3);
+
+  var wordSyllableMap = createWordSyllableMap({
+    dbLocation: __dirname + '/../data/word-syllable.db'
+  });
 
   function mockGetPartsOfSpeechForMultipleWords(words, done) {
     callNextTick(done, null, words.map(getPartsOfSpeechForWord));
@@ -32,14 +34,23 @@ test('Build sentence', function buildSentenceTest(t) {
     callNextTick(done, null, ['get', 'some']);
   }
 
-  function mockCountSyllables(word, done) {
-    callNextTick(done, null, infoForWords[word].syllableCount);
+  function countSyllables(word, done) {
+    wordSyllableMap.syllablesForWord(word, getCount);
+    function getCount(error, syllables) {
+      if (error) {
+        done(error);
+      }
+      else {
+        console.log(syllables);
+        done(error, syllables.length);
+      }
+    }
   }
 
   createBuildSentence(
     {
       getPartsOfSpeechForMultipleWords: mockGetPartsOfSpeechForMultipleWords,
-      countSyllables: mockCountSyllables,
+      countSyllables: countSyllables,
       getRandomWords: mockGetRandomWords
     },
     useBuilder
@@ -59,7 +70,9 @@ test('Build sentence', function buildSentenceTest(t) {
 
   function checkSentence(error, sentence) {
     t.ok(!error, 'No error while building sentence.');
-    t.equal(sentence, 'Get some sleep');
-  }
 
+    t.equal(sentence, 'get some sleep');
+
+    wordSyllableMap.close();
+  }
 });

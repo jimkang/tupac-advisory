@@ -33,7 +33,7 @@ function createBuildSentence(createOpts, createDone) {
       return;
     }
 
-    countSyllables(endWord, evaluateSyllableSituation);
+    countSyllables(endWord.toUpperCase(), evaluateSyllableSituation);
 
     function evaluateSyllableSituation(error, count) {
       if (error) {
