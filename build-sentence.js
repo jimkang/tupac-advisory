@@ -4,14 +4,16 @@ var async = require('async');
 function createBuildSentence(createOpts, createDone) {
   var getPartsOfSpeechForMultipleWords;
   var countSyllables;
-  var getRandomWords;
+  var fillPhraseHead;
+  var pickFromArray;
 
   if (createOpts) {
     getPartsOfSpeechForMultipleWords =
       createOpts.getPartsOfSpeechForMultipleWords;
 
     countSyllables = createOpts.countSyllables;
-    getRandomWords = createOpts.getRandomWords;
+    fillPhraseHead = createOpts.fillPhraseHead;
+    pickFromArray = createOpts.pickFromArray;
   }
 
   function buildSentence(opts, buildDone) {
@@ -51,69 +53,57 @@ function createBuildSentence(createOpts, createDone) {
     }
 
     function fillInSentence(count) {
-      getPartsOfSpeechForMultipleWords([endWord], getActingWordForPOS);
+      getPartsOfSpeechForMultipleWords([endWord], fillMiddleWordForPOS);
     }
 
     // If the ending word is a noun, then we can act on it with a verb.
+    // If it's a verb, then that alone is fine.
     // We don't know what to do with anything else – yet.
     // Maybe we can find a verb for an adverb? But then, the article would be 
     // skippped.
-    function getActingWordForPOS(error, partsOfSpeech) {
+    function fillMiddleWordForPOS(error, partsOfSpeech) {
       if (error) {
         buildDone(error);
       }
       else if (partsOfSpeech.length < 1 ||
+        partsOfSpeech[0].indexOf('verb') !== -1 ||
         partsOfSpeech[0].indexOf('noun') === -1) {
 
         buildDone(error, endWord);
       }
       else {
-        getRandomWords(
-          {
-            customParams: {
-              includePartOfSpeech: 'verb'              
-            }
-          },
-          pickActingWordFromRandomWords
-        );
+        var fillMiddleOpts = {
+          phrase: endWord,
+          headPOS: 'determiner'
+        };
+        fillPhraseHead(fillMiddleOpts, fillStartWord);
       }
     }
 
-    function pickActingWordFromRandomWords(error, words) {
+    function fillStartWord(error, determiners) {
+      var determiner;
+      debugger;
       if (error) {
         buildDone(error);
       }
       else {
-        getPartsOfSpeechForMultipleWords(words, pickFromVerbs);
+        determiner = pickFromArray(determiners);
+        var fillStartOpts = {
+          phrase: determiner + ' ' + endWord
+        };
+        fillPhraseHead(fillStartOpts, assemblePhrase);
       }
 
-      function pickFromVerbs(error, partsOfSpeech) {
+      function assemblePhrase(error, startWords) {
+        debugger;
         if (error) {
           buildDone(error);
         }
         else {
-          // TODO: Pick at random instead of just the first one.
-          var verb;
-          for (var i = 0; i < partsOfSpeech.length; ++i) {
-            if (partsOfSpeech[i].indexOf('verb') !== -1) {
-              verb = words[i];
-              break;
-            }
-          }
-
-          if (!verb) {
-            buildDone(error, endWord);
-          }
-          else {
-            buildWithActionWord(verb);
-          }
+          var startWord = pickFromArray(startWords);
+          buildDone(error, startWord + ' ' + determiner + ' ' + endWord);
         }
       }
-    }
-
-    function buildWithActionWord(actionWord) {
-      // TODO: Find a "joiner" word, e.g. "actionWord joiner endWord".
-      buildDone(null, actionWord + ' ' + endWord);
     }
   }
 

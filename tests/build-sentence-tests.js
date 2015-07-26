@@ -15,6 +15,11 @@ var infoForWords = {
   }
 }
 
+var headsForPhrases = {
+  sleep: ['some', 'little'],
+  'some sleep': ['get', 'had']
+};
+
 test('Build sentence', function buildSentenceTest(t) {
   t.plan(3);
 
@@ -30,8 +35,12 @@ test('Build sentence', function buildSentenceTest(t) {
     return infoForWords[word].partsOfSpeech;
   }
 
-  function mockGetRandomWords(opts, done) {
-    callNextTick(done, null, ['get', 'some']);
+  function mockFillPhraseHead(opts, done) {
+    callNextTick(done, null, headsForPhrases[opts.phrase]);
+  }
+
+  function mockPickFromArray(array) {
+    return array[0];
   }
 
   function countSyllables(word, done) {
@@ -51,7 +60,8 @@ test('Build sentence', function buildSentenceTest(t) {
     {
       getPartsOfSpeechForMultipleWords: mockGetPartsOfSpeechForMultipleWords,
       countSyllables: countSyllables,
-      getRandomWords: mockGetRandomWords
+      fillPhraseHead: mockFillPhraseHead,
+      pickFromArray: mockPickFromArray
     },
     useBuilder
   );
