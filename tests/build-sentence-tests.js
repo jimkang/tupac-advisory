@@ -1,7 +1,7 @@
 var test = require('tape');
 var createBuildSentence = require('../build-sentence');
 var callNextTick = require('call-next-tick');
-var createWordSyllableMap = require('word-syllable-map').createWordSyllableMap;
+var syllableCounter = require('../syllable-counter')();
 
 var infoForWords = {
   sleep: {
@@ -23,10 +23,6 @@ var headsForPhrases = {
 test('Build sentence', function buildSentenceTest(t) {
   t.plan(2);
 
-  var wordSyllableMap = createWordSyllableMap({
-    dbLocation: __dirname + '/../data/word-syllable.db'
-  });
-
   function mockGetPartsOfSpeechForMultipleWords(words, done) {
     callNextTick(done, null, words.map(getPartsOfSpeechForWord));
   }
@@ -43,22 +39,9 @@ test('Build sentence', function buildSentenceTest(t) {
     return array[0];
   }
 
-  function countSyllables(word, done) {
-    wordSyllableMap.syllablesForWord(word, getCount);
-    function getCount(error, syllables) {
-      if (error) {
-        done(error);
-      }
-      else {
-        console.log(syllables);
-        done(error, syllables.length);
-      }
-    }
-  }
-
   var buildSentence = createBuildSentence({
     getPartsOfSpeechForMultipleWords: mockGetPartsOfSpeechForMultipleWords,
-    countSyllables: countSyllables,
+    countSyllables: syllableCounter.countSyllables,
     fillPhraseHead: mockFillPhraseHead,
     pickFromArray: mockPickFromArray
   });
@@ -76,6 +59,6 @@ test('Build sentence', function buildSentenceTest(t) {
 
     t.equal(sentence, 'get some sleep');
 
-    wordSyllableMap.close();
+    syllableCounter.close();
   }
 });
