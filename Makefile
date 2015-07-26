@@ -5,7 +5,7 @@ test:
 	node tests/advise-tests.js
 
 test-integration:
-	node tests/integration/get-determiners-for-word-tests.js
+	node tests/integration/fill-phrase-head-tests.js
 
 start: start-tupac-advisory
 	psy start -n tupac-advisory -- node tupac-advisory.js

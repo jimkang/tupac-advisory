@@ -1,16 +1,19 @@
 var test = require('tape');
-var createGetDeterminersForWord = require('../../get-determiners-for-word');
+var createFillPhraseHead = require('../../fill-phrase-head');
 
 test('Get determiners for a word', function getDeterminersTest(t) {
   t.plan(3);
 
-  var getDeterminersForWord = createGetDeterminersForWord({
+  var fillPhraseHead = createFillPhraseHead({
 
   });
 
-  var word = 'cat';
+  var opts = {
+    phrase: ' cat',
+    headPOS: 'determiner'
+  };
 
-  getDeterminersForWord(word, checkDeterminers);
+  fillPhraseHead(opts, checkDeterminers);
 
   function checkDeterminers(error, determiners) {
     t.ok(!error, 'No error while getting determiners.');
