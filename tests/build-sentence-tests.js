@@ -21,7 +21,7 @@ var headsForPhrases = {
 };
 
 test('Build sentence', function buildSentenceTest(t) {
-  t.plan(3);
+  t.plan(2);
 
   var wordSyllableMap = createWordSyllableMap({
     dbLocation: __dirname + '/../data/word-syllable.db'
@@ -56,27 +56,20 @@ test('Build sentence', function buildSentenceTest(t) {
     }
   }
 
-  createBuildSentence(
+  var buildSentence = createBuildSentence({
+    getPartsOfSpeechForMultipleWords: mockGetPartsOfSpeechForMultipleWords,
+    countSyllables: countSyllables,
+    fillPhraseHead: mockFillPhraseHead,
+    pickFromArray: mockPickFromArray
+  });
+
+  buildSentence(
     {
-      getPartsOfSpeechForMultipleWords: mockGetPartsOfSpeechForMultipleWords,
-      countSyllables: countSyllables,
-      fillPhraseHead: mockFillPhraseHead,
-      pickFromArray: mockPickFromArray
+      endWord: 'sleep',
+      desiredSyllables: 3
     },
-    useBuilder
+    checkSentence
   );
-
-  function useBuilder(error, buildSentence) {
-    t.ok(!error, 'No error when creating builder.');
-
-    buildSentence(
-      {
-        endWord: 'sleep',
-        desiredSyllables: 3
-      },
-      checkSentence
-    );
-  }
 
   function checkSentence(error, sentence) {
     t.ok(!error, 'No error while building sentence.');

@@ -1,7 +1,7 @@
 var callNextTick = require('call-next-tick');
 var async = require('async');
 
-function createBuildSentence(createOpts, createDone) {
+function createBuildSentence(createOpts) {
   var getPartsOfSpeechForMultipleWords;
   var countSyllables;
   var fillPhraseHead;
@@ -82,7 +82,7 @@ function createBuildSentence(createOpts, createDone) {
 
     function fillStartWord(error, determiners) {
       var determiner;
-      debugger;
+
       if (error) {
         buildDone(error);
       }
@@ -95,7 +95,6 @@ function createBuildSentence(createOpts, createDone) {
       }
 
       function assemblePhrase(error, startWords) {
-        debugger;
         if (error) {
           buildDone(error);
         }
@@ -107,7 +106,7 @@ function createBuildSentence(createOpts, createDone) {
     }
   }
 
-  callNextTick(createDone, null, buildSentence);
+  return buildSentence;
 }
 
 module.exports = createBuildSentence;

@@ -3,6 +3,7 @@ GITDIR = /var/repos/tupac-advisory.git
 
 test:
 	node tests/advise-tests.js
+	node tests/build-sentence-tests.js
 
 test-integration:
 	node tests/integration/fill-phrase-head-tests.js
