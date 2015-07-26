@@ -35,7 +35,7 @@ function createFillPhraseHead(createOpts) {
     }
   }
 
-  return getDeterminersForWord;
+  return fillPhraseHead;
 }
 
 var termsForPOS = {
