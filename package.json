@@ -23,6 +23,7 @@
   "dependencies": {
     "async": "^0.9.2",
     "call-next-tick": "^1.1.2",
+    "ngram-getter": "^1.0.2",
     "probable": "^1.6.0",
     "rime": "^1.0.0",
     "twit": "^1.1.20",

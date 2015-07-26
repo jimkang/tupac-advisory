@@ -4,6 +4,9 @@ GITDIR = /var/repos/tupac-advisory.git
 test:
 	node tests/advise-tests.js
 
+test-integration:
+	node tests/integration/get-determiners-for-word-tests.js
+
 start: start-tupac-advisory
 	psy start -n tupac-advisory -- node tupac-advisory.js
 
