@@ -61,13 +61,13 @@ function createBuildSentence(createOpts) {
     // We don't know what to do with anything else – yet.
     // Maybe we can find a verb for an adverb? But then, the article would be 
     // skippped.
-    function fillMiddleWordForPOS(error, partsOfSpeech) {
+    function fillMiddleWordForPOS(error, partsOfSpeechLists) {
       if (error) {
         buildDone(error);
       }
-      else if (partsOfSpeech.length < 1 ||
-        partsOfSpeech[0].indexOf('verb') !== -1 ||
-        partsOfSpeech[0].indexOf('noun') === -1) {
+      else if (partsOfSpeechLists.length < 1 ||
+        (partsOfSpeechLists[0].indexOf('noun') === -1 &&
+        partsOfSpeechLists[0].indexOf('verb') !== -1)) {
 
         buildDone(error, endWord);
       }

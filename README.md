@@ -28,7 +28,7 @@ Usage
 Tests
 -----
 
-Run tests with `make test`.
+Run tests with `make test`. Run live tests (they hit the Internet) with `make test-live'.
 
 License
 -------
