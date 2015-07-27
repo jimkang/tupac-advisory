@@ -25,6 +25,7 @@
     "call-next-tick": "^1.1.2",
     "ngram-getter": "^1.0.2",
     "probable": "^1.6.0",
+    "queue-async": "^1.0.7",
     "rime": "^1.0.0",
     "seedrandom": "^2.4.2",
     "twit": "^1.1.20",

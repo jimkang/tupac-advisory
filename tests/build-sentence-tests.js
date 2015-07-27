@@ -2,6 +2,7 @@ var test = require('tape');
 var createBuildSentence = require('../build-sentence');
 var callNextTick = require('call-next-tick');
 var syllableCounter = require('../syllable-counter')();
+var queue = require('queue-async');
 
 var infoForWords = {
   sleep: {
@@ -12,12 +13,43 @@ var infoForWords = {
   },
   some: {
     partsOfSpeech: ['adjective']
+  },
+  chip: {
+    partsOfSpeech: ['noun', 'verb']
+  },
+  is: {
+    partsOfSpeech: ['verb']
+  },
+  remove: {
+    partsOfSpeech: ['verb']
+  },
+  dip: {
+    partsOfSpeech: ['verb', 'noun']
+  },
+  every: {
+    partsOfSpeech: ['determiner']
+  },
+  the: {
+    partsOfSpeech: ['determiner']
+  },
+  following: {
+    partsOfSpeech: ['noun', 'verb']
+  },
+  called: {
+    partsOfSpeech: ['verb']
+  },
+  determining: {
+    partsOfSpeech: ['adjective']
   }
 }
 
 var headsForPhrases = {
   sleep: ['some', 'little'],
-  'some sleep': ['get', 'had']
+  'some sleep': ['get', 'had'],
+  chip: ['the'],
+  'the chip': ['is', 'remove'],
+  dip: ['every', 'the'],
+  'the dip': ['following', 'called', 'determining']
 };
 
 function mockGetPartsOfSpeechForMultipleWords(words, done) {
@@ -43,15 +75,37 @@ var testCases = [
       desiredSyllables: 3
     },
     expected: 'get some sleep'
+  },
+  {
+    opts: {
+      endWord: 'chip',
+      desiredSyllables: 3
+    },
+    expected: 'remove the chip'
+  },
+  {
+    opts: {
+      endWord: 'dip',
+      desiredSyllables: 3
+    },
+    expected: 'call the dip'
   }
 ];
 
-testCases.forEach(runTest);
+test('Build sentences', function buildSentencesTests(t) {
+  t.plan(2 * testCases.length + 1);
 
-function runTest(testCase) {
-  test('Build sentence', function buildSentenceTest(t) {
-    t.plan(2);
+  var q = queue();
 
+  testCases.forEach(scheduleTest);
+
+  function scheduleTest(testCase) {
+    q.defer(runTest, testCase);
+  }
+
+  q.awaitAll(cleanUp);
+
+  function runTest(testCase) {
     var buildSentence = createBuildSentence({
       getPartsOfSpeechForMultipleWords: mockGetPartsOfSpeechForMultipleWords,
       countSyllables: syllableCounter.countSyllables,
@@ -59,15 +113,19 @@ function runTest(testCase) {
       pickFromArray: mockPickFromArray
     });
 
-    buildSentence(
-      testCase.opts,
-      checkSentence
-    );
+    buildSentence(testCase.opts, checkSentence);
 
     function checkSentence(error, sentence) {
+      if (error) {
+        console.log(error);
+      }
       t.ok(!error, 'No error while building sentence.');
       t.equal(sentence, testCase.expected);
-      syllableCounter.close();
     }
-  });
-}
+  }
+
+  function cleanUp() {
+    t.pass('Cleaning up.');
+    syllableCounter.close();
+  }
+});
