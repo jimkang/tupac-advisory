@@ -1,11 +1,17 @@
 var callNextTick = require('call-next-tick');
 var async = require('async');
+var jsonfile = require('jsonfile');
+
+var defaultUnusablePhraseStarters = jsonfile.readFileSync(
+  __dirname + '/data/unusable-phrase-starters.json'
+);
 
 function createBuildSentence(createOpts) {
   var getPartsOfSpeechForMultipleWords;
   var countSyllables;
   var fillPhraseHead;
   var pickFromArray;
+  var unusablePhraseStarters;
 
   if (createOpts) {
     getPartsOfSpeechForMultipleWords =
@@ -14,6 +20,11 @@ function createBuildSentence(createOpts) {
     countSyllables = createOpts.countSyllables;
     fillPhraseHead = createOpts.fillPhraseHead;
     pickFromArray = createOpts.pickFromArray;
+    unusablePhraseStarters = createOpts.unusablePhraseStarters;
+  }
+
+  if (unusablePhraseStarters === undefined) {
+    unusablePhraseStarters = defaultUnusablePhraseStarters;
   }
 
   function buildSentence(opts, buildDone) {
@@ -100,11 +111,23 @@ function createBuildSentence(createOpts) {
           buildDone(error);
         }
         else {
-          var startWord = pickFromArray(startWords);
-          buildDone(error, startWord + ' ' + determiner + ' ' + endWord);
+          if (startWords === undefined) {
+            debugger;
+          }
+
+          var phrase = determiner + ' ' + endWord;
+          if (startWords) {
+            var startWord = pickFromArray(startWords.filter(startWordIsUsable));
+            phrase = startWord + ' ' + phrase;
+          }
+          buildDone(error, phrase);
         }
       }
     }
+  }
+
+  function startWordIsUsable(word) {
+    return unusablePhraseStarters.indexOf(word) === -1;
   }
 
   return buildSentence;

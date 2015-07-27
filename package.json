@@ -23,6 +23,7 @@
   "dependencies": {
     "async": "^0.9.2",
     "call-next-tick": "^1.1.2",
+    "jsonfile": "^2.2.1",
     "ngram-getter": "^1.0.2",
     "probable": "^1.6.0",
     "queue-async": "^1.0.7",

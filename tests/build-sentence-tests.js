@@ -3,6 +3,7 @@ var createBuildSentence = require('../build-sentence');
 var callNextTick = require('call-next-tick');
 var syllableCounter = require('../syllable-counter')();
 var queue = require('queue-async');
+var jsonfile = require('jsonfile');
 
 var infoForWords = {
   sleep: {
@@ -49,8 +50,13 @@ var headsForPhrases = {
   chip: ['the'],
   'the chip': ['is', 'remove'],
   dip: ['every', 'the'],
-  'the dip': ['following', 'called', 'determining']
+  'the dip': ['following', 'called', 'determining'],
+  'every dip': ['knew']
 };
+
+var unusablePhraseStarters = jsonfile.readFileSync(
+  __dirname + '/../data/unusable-phrase-starters.json'
+);
 
 function mockGetPartsOfSpeechForMultipleWords(words, done) {
   callNextTick(done, null, words.map(getPartsOfSpeechForWord));
@@ -88,7 +94,7 @@ var testCases = [
       endWord: 'dip',
       desiredSyllables: 3
     },
-    expected: 'call the dip'
+    expected: 'know every dip'
   }
 ];
 
@@ -110,7 +116,8 @@ test('Build sentences', function buildSentencesTests(t) {
       getPartsOfSpeechForMultipleWords: mockGetPartsOfSpeechForMultipleWords,
       countSyllables: syllableCounter.countSyllables,
       fillPhraseHead: mockFillPhraseHead,
-      pickFromArray: mockPickFromArray
+      pickFromArray: mockPickFromArray,
+      unusablePhraseStarters: unusablePhraseStarters
     });
 
     buildSentence(testCase.opts, checkSentence);
