@@ -89,7 +89,8 @@ function createBuildSentence(createOpts) {
       else {
         determiner = pickFromArray(determiners);
         var fillStartOpts = {
-          phrase: determiner + ' ' + endWord
+          phrase: determiner + ' ' + endWord,
+          headPOS: 'verb'
         };
         fillPhraseHead(fillStartOpts, assemblePhrase);
       }

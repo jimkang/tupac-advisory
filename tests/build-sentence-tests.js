@@ -20,45 +20,54 @@ var headsForPhrases = {
   'some sleep': ['get', 'had']
 };
 
-test('Build sentence', function buildSentenceTest(t) {
-  t.plan(2);
+function mockGetPartsOfSpeechForMultipleWords(words, done) {
+  callNextTick(done, null, words.map(getPartsOfSpeechForWord));
+}
 
-  function mockGetPartsOfSpeechForMultipleWords(words, done) {
-    callNextTick(done, null, words.map(getPartsOfSpeechForWord));
-  }
+function getPartsOfSpeechForWord(word) {
+  return infoForWords[word].partsOfSpeech;
+}
 
-  function getPartsOfSpeechForWord(word) {
-    return infoForWords[word].partsOfSpeech;
-  }
+function mockFillPhraseHead(opts, done) {
+  callNextTick(done, null, headsForPhrases[opts.phrase]);
+}
 
-  function mockFillPhraseHead(opts, done) {
-    callNextTick(done, null, headsForPhrases[opts.phrase]);
-  }
+function mockPickFromArray(array) {
+  return array[0];
+}
 
-  function mockPickFromArray(array) {
-    return array[0];
-  }
-
-  var buildSentence = createBuildSentence({
-    getPartsOfSpeechForMultipleWords: mockGetPartsOfSpeechForMultipleWords,
-    countSyllables: syllableCounter.countSyllables,
-    fillPhraseHead: mockFillPhraseHead,
-    pickFromArray: mockPickFromArray
-  });
-
-  buildSentence(
-    {
+var testCases = [
+  {
+    opts: {
       endWord: 'sleep',
       desiredSyllables: 3
     },
-    checkSentence
-  );
-
-  function checkSentence(error, sentence) {
-    t.ok(!error, 'No error while building sentence.');
-
-    t.equal(sentence, 'get some sleep');
-
-    syllableCounter.close();
+    expected: 'get some sleep'
   }
-});
+];
+
+testCases.forEach(runTest);
+
+function runTest(testCase) {
+  test('Build sentence', function buildSentenceTest(t) {
+    t.plan(2);
+
+    var buildSentence = createBuildSentence({
+      getPartsOfSpeechForMultipleWords: mockGetPartsOfSpeechForMultipleWords,
+      countSyllables: syllableCounter.countSyllables,
+      fillPhraseHead: mockFillPhraseHead,
+      pickFromArray: mockPickFromArray
+    });
+
+    buildSentence(
+      testCase.opts,
+      checkSentence
+    );
+
+    function checkSentence(error, sentence) {
+      t.ok(!error, 'No error while building sentence.');
+      t.equal(sentence, testCase.expected);
+      syllableCounter.close();
+    }
+  });
+}
