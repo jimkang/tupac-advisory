@@ -12,6 +12,7 @@ function createBuildSentence(createOpts) {
   var fillPhraseHead;
   var pickFromArray;
   var unusablePhraseStarters;
+  var getPresentTenseOfVerb;
 
   if (createOpts) {
     getPartsOfSpeechForMultipleWords =
@@ -21,6 +22,7 @@ function createBuildSentence(createOpts) {
     fillPhraseHead = createOpts.fillPhraseHead;
     pickFromArray = createOpts.pickFromArray;
     unusablePhraseStarters = createOpts.unusablePhraseStarters;
+    getPresentTenseOfVerb = createOpts.getPresentTenseOfVerb;
   }
 
   if (unusablePhraseStarters === undefined) {
@@ -103,21 +105,31 @@ function createBuildSentence(createOpts) {
           phrase: determiner + ' ' + endWord,
           headPOS: 'verb'
         };
-        fillPhraseHead(fillStartOpts, assemblePhrase);
+        fillPhraseHead(fillStartOpts, getPresentTenseStartWord);
       }
 
-      function assemblePhrase(error, startWords) {
+      // TODO: Declutter with asnyc.waterfall.
+
+      function getPresentTenseStartWord(error, startWords) {
+        if (error) {
+          buildDone(error);
+        }
+        else if (startWords) {
+          var startWord = pickFromArray(startWords.filter(startWordIsUsable));          
+          getPresentTenseOfVerb(startWord, assemblePhrase);
+        }
+        else {
+          callNextTick(assemblePhrase, error);
+        }
+      }
+
+      function assemblePhrase(error, startWord) {
         if (error) {
           buildDone(error);
         }
         else {
-          if (startWords === undefined) {
-            debugger;
-          }
-
           var phrase = determiner + ' ' + endWord;
-          if (startWords) {
-            var startWord = pickFromArray(startWords.filter(startWordIsUsable));
+          if (startWord) {
             phrase = startWord + ' ' + phrase;
           }
           buildDone(error, phrase);

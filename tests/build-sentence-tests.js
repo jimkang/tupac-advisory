@@ -54,6 +54,10 @@ var headsForPhrases = {
   'every dip': ['knew']
 };
 
+var presentTensesOfVerbs = {
+  knew: 'know'
+};
+
 var unusablePhraseStarters = jsonfile.readFileSync(
   __dirname + '/../data/unusable-phrase-starters.json'
 );
@@ -72,6 +76,14 @@ function mockFillPhraseHead(opts, done) {
 
 function mockPickFromArray(array) {
   return array[0];
+}
+
+function mockGetPresentTenseOfVerb(verb, done) {
+  var presentTense = presentTensesOfVerbs[verb];
+  if (!presentTense) {
+    presentTense = verb;
+  }
+  callNextTick(done, null, presentTense);
 }
 
 var testCases = [
@@ -99,17 +111,9 @@ var testCases = [
 ];
 
 test('Build sentences', function buildSentencesTests(t) {
-  t.plan(2 * testCases.length + 1);
+  t.plan(2 * testCases.length);
 
-  var q = queue();
-
-  testCases.forEach(scheduleTest);
-
-  function scheduleTest(testCase) {
-    q.defer(runTest, testCase);
-  }
-
-  q.awaitAll(cleanUp);
+  testCases.forEach(runTest);
 
   function runTest(testCase) {
     var buildSentence = createBuildSentence({
@@ -117,22 +121,19 @@ test('Build sentences', function buildSentencesTests(t) {
       countSyllables: syllableCounter.countSyllables,
       fillPhraseHead: mockFillPhraseHead,
       pickFromArray: mockPickFromArray,
-      unusablePhraseStarters: unusablePhraseStarters
+      unusablePhraseStarters: unusablePhraseStarters,
+      getPresentTenseOfVerb: mockGetPresentTenseOfVerb
     });
 
     buildSentence(testCase.opts, checkSentence);
 
     function checkSentence(error, sentence) {
+      // console.log(sentence);
       if (error) {
         console.log(error);
       }
       t.ok(!error, 'No error while building sentence.');
       t.equal(sentence, testCase.expected);
     }
-  }
-
-  function cleanUp() {
-    t.pass('Cleaning up.');
-    syllableCounter.close();
   }
 });
