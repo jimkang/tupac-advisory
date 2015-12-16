@@ -1,34 +1,42 @@
 HOMEDIR = $(shell pwd)
-GITDIR = /var/repos/tupac-advisory.git
+
+stop-docker-machine:
+	docker-machine stop dev
+
+start-docker-machine:
+	docker-machine start dev
+
+create-docker-machine:
+	docker-machine create --driver virtualbox dev
+
+# eval "$(docker-machine env dev)"
+
+build-docker-image:
+	docker build -t jkang/tupac-advisory .
+
+push-docker-image: build-docker-image
+	docker push jkang/tupac-advisory
+
+run-docker-image:
+	docker run \
+		-v $(HOMEDIR)/config:/usr/src/app/config \
+		jkang/tupac-advisory make run
+
+pushall: push-docker-image
+	git push origin master
+
+run:
+	node post-tweet.js
 
 test:
-	node tests/advise-tests.js
-	node tests/build-sentence-tests.js
+	docker run \
+		jkang/tupac-advisory \
+		node tests/advise-tests.js && node tests/build-sentence-tests.js
 
 test-live:
-	node tests/live/fill-phrase-head-tests.js
-
-start: start-tupac-advisory
-	psy start -n tupac-advisory -- node tupac-advisory.js
-
-stop:
-	psy stop tupac-advisory || echo "Non-zero return code is OK."
-	
-sync-worktree-to-git:
-	git --work-tree=$(HOMEDIR) --git-dir=$(GITDIR) checkout -f
-
-npm-install:
-	cd $(HOMEDIR)
-	npm install
-	npm prune
-
-post-receive: sync-worktree-to-git npm-install stop start
-
-build-rime-db:
-	cd node_modules/rime && \
-	make build-word-phoneme-map
+	docker run jkang/tupac-advisory node tests/live/fill-phrase-head-tests.js
 
 data/word-syllable.db:
 	node setup/build-syllable-database.js
 
-setup: build-rime-db data/word-syllable.db
+setup: data/word-syllable.db
