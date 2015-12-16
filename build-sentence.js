@@ -55,13 +55,17 @@ function createBuildSentence(createOpts) {
         buildDone(error);
       }
       else {
-        var syllablesNeeded = desiredSyllables - count;
-        if (syllablesNeeded < 1) {
-          buildDone(error, endWord);
-        }
-        else {
+        // TODO: Bring this back once you've determined the endWord is a verb.
+        // If it's a noun, it's not OK to not fill in the sentence, even if 
+        // the noun has a lot of syllables.
+
+        // var syllablesNeeded = desiredSyllables - count;
+        // if (syllablesNeeded < 1) {
+        //   buildDone(error, endWord);
+        // }
+        // else {
           fillInSentence(count);
-        }
+        // }
       }
     }
 

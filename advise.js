@@ -28,6 +28,7 @@ function createAdvise(opts, createDone) {
   callNextTick(createDone, null, advise);
 
   function advise(opts, done) {
+    debugger;
     getRhymes(
       {
         base: opts.base
@@ -36,6 +37,7 @@ function createAdvise(opts, createDone) {
     );
 
     function shuffleRhymes(error, rhymes) {
+      debugger;
       if (error) {
         done(error);
       }
@@ -57,6 +59,7 @@ function createAdvise(opts, createDone) {
       );
 
       function useSentence(error, sentence) {
+        debugger;
         if (error) {
           if (error instanceof SentenceNotPossibleError) {
             if (rhymes.length > 1) {

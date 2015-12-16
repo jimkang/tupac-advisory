@@ -17,21 +17,20 @@
     "url": "https://github.com/jimkang/tupac-advisory/issues"
   },
   "homepage": "https://github.com/jimkang/tupac-advisory",
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "dependencies": {
     "async": "^0.9.2",
     "call-next-tick": "^1.1.2",
     "jsonfile": "^2.2.1",
-    "ngram-getter": "^1.0.2",
+    "ngram-getter": "^1.0.6",
     "probable": "^1.6.0",
     "queue-async": "^1.0.7",
     "rime": "^1.0.0",
     "seedrandom": "^2.4.2",
+    "tape": "^3.0.3",
     "twit": "^1.1.20",
     "verror": "^1.6.0",
     "word-syllable-map": "^1.0.2",
-    "wordnok": "jimkang/wordnok#no-cache",
-    "tape": "^3.0.3"
+    "wordnok": "jimkang/wordnok#no-cache"
   }
 }

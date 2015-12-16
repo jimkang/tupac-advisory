@@ -26,6 +26,8 @@ function createFillPhraseHead(createOpts) {
     getNgrams(ngramOpts, distillNgramResults);
 
     function distillNgramResults(error, ngramsGroups) {
+      console.log('Got ngram results for ', ngramOpts.phrases);
+      debugger;
       if (error) {
         done(error);
       }

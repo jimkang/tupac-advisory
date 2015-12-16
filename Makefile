@@ -12,15 +12,15 @@ create-docker-machine:
 # eval "$(docker-machine env dev)"
 
 build-docker-image:
-	docker build -t jkang/tupac-advisory .
+	docker build -t jkang/tupac .
 
 push-docker-image: build-docker-image
-	docker push jkang/tupac-advisory
+	docker push jkang/tupac
 
 run-docker-image:
 	docker run \
 		-v $(HOMEDIR)/config:/usr/src/app/config \
-		jkang/tupac-advisory make run
+		jkang/tupac make run
 
 pushall: push-docker-image
 	git push origin master
@@ -30,11 +30,11 @@ run:
 
 test:
 	docker run \
-		jkang/tupac-advisory \
+		jkang/tupac \
 		node tests/advise-tests.js && node tests/build-sentence-tests.js
 
 test-live:
-	docker run jkang/tupac-advisory node tests/live/fill-phrase-head-tests.js
+	docker run jkang/tupac node tests/live/fill-phrase-head-tests.js
 
 data/word-syllable.db:
 	node setup/build-syllable-database.js
